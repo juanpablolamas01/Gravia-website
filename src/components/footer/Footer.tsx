@@ -29,7 +29,7 @@ const Footer: React.FC = () => {
               <img src={callIcon} alt="call" />
             </a>
             <a className="contact-method" href="tel:+112304528597">
-              +(598) 99 855 999
+              +(598) 95 855 999
             </a>
           </div>
         </div>

@@ -146,7 +146,7 @@ const ContactForm: React.FC = () => {
       {/* Submit Button */}
       <div className="form-submit-btn mt-35">
         <button type="submit" className="thm-btn form-btn" disabled={isSubmitting}>
-          {isSubmitting ? "Enviando..." : "Enviar"}
+          {isSubmitting ? "Enviando..." : "Send Message"}
           <span className="xb-icon">
             <img src={arrowIcon} alt="arrow" />
             <img src={arrowIcon} alt="arrow" />

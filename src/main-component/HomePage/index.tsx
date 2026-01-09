@@ -9,12 +9,12 @@ import Scrollbar from "../../components/scrollbar/scrollbar";
 
 const HomePage: React.FC = () => {
   useEffect(() => {
-    document.title = "Home | AI Agency & Technology React Template";
+    document.title = "Gravia | All-In-One Marketing and Crisis Prevention Tool ";
   }, []);
 
   return (
     <Fragment>
-        <div className='ai-agency'>
+        <div className='AI Powered Marketing Platform'>
           <div className="body_wrap o-clip">
             <Header />
             <main>

@@ -39,6 +39,11 @@ const Header: React.FC = () => {
 
   const handleClick = () => window.scrollTo({ top: 0, behavior: "smooth" });
   const handleSubmit = (e: React.FormEvent) => e.preventDefault();
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) element.scrollIntoView({ behavior: "smooth" });
+    setMobileActive(false);
+  };
 
   return (
     <header
@@ -46,9 +51,8 @@ const Header: React.FC = () => {
       className="header-area header-style--one header-transparent is-sticky"
     >
       <div
-        className={`xb-header xb-sticky-stt ${
-          isSticky ? "xb-header-area-sticky" : ""
-        } ${isVisible ? "xb-header-fixed" : "xb-header-hidden"}`}
+        className={`xb-header xb-sticky-stt ${isSticky ? "xb-header-area-sticky" : ""
+          } ${isVisible ? "xb-header-fixed" : "xb-header-hidden"}`}
         style={{
           background: "linear-gradient(180deg, rgba(8, 8, 11, 0.95) 0%, rgba(8, 8, 11, 0.7) 50%, rgba(8, 8, 11, 0.3) 100%)",
           boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
@@ -94,9 +98,16 @@ const Header: React.FC = () => {
 
             {/* Button */}
             <div className="header-btn">
-              <Link to="/contact" className="thm-btn" onClick={handleClick}>
+              <a
+                href="#contact-section"
+                className="thm-btn"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection("contact-section");
+                }}
+              >
                 Join the wishlist
-              </Link>
+              </a>
             </div>
 
             {/* Mobile Toggle */}

@@ -15,6 +15,8 @@ const ContactForm: React.FC = () => {
     phone: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
 
   const [validator] = useState(
     new SimpleReactValidator({ className: "errorMessage" })
@@ -30,20 +32,41 @@ const ContactForm: React.FC = () => {
     else validator.showMessages();
   };
 
-  const submitHandler = (e: React.FormEvent) => {
+  const submitHandler = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (validator.allValid()) {
-      console.log("✅ Form submitted:", forms);
-      alert("Form submitted successfully!");
+      setIsSubmitting(true);
+      setStatusMessage("");
 
-      setForms({
-        name: "",
-        email: "",
-        phone: "",
-        message: "",
-      });
-      validator.hideMessages();
+      try {
+        const response = await fetch("/api/contact", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(forms),
+        });
+
+        if (!response.ok) {
+          throw new Error("Request failed");
+        }
+
+        setForms({
+          name: "",
+          email: "",
+          phone: "",
+          message: "",
+        });
+        validator.hideMessages();
+        setStatusMessage("Gracias. Tu mensaje fue enviado correctamente.");
+      } catch (error) {
+        setStatusMessage(
+          "No se pudo enviar el mensaje. Intenta nuevamente en unos minutos."
+        );
+      } finally {
+        setIsSubmitting(false);
+      }
     } else {
       validator.showMessages();
     }
@@ -122,14 +145,15 @@ const ContactForm: React.FC = () => {
 
       {/* Submit Button */}
       <div className="form-submit-btn mt-35">
-        <button type="submit" className="thm-btn form-btn">
-          Submit Here
+        <button type="submit" className="thm-btn form-btn" disabled={isSubmitting}>
+          {isSubmitting ? "Enviando..." : "Enviar"}
           <span className="xb-icon">
             <img src={arrowIcon} alt="arrow" />
             <img src={arrowIcon} alt="arrow" />
           </span>
         </button>
       </div>
+      {statusMessage && <p className="mt-20">{statusMessage}</p>}
     </form>
   );
 };

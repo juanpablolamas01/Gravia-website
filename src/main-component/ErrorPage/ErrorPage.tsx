@@ -18,12 +18,9 @@ const ErrorPage: React.FC = () => {
                 <div className="row justify-content-center">
                   <div className="col-lg-12">
                     <div className="contant-wrapper text-center">
-                      <div className="error-page__text">
-                        <h2>404</h2>
-                      </div>
                       <div className="error-page__content mb-50">
-                        <h2>Hi Sorry We Can’t Find That Page!</h2>
-                        <p>Oops! The page you are looking for does not exist. It might have been moved or deleted.</p>
+                        <h2>Oops!</h2>
+                        <p>The page you are looking for does not exist. It might have been moved or deleted.</p>
 
                         <div className="error-page-button">
                           <Link className="thm-btn agency-btn" to="/">

@@ -1,0 +1,39 @@
+#service-section .xb-item--item {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Space + centering */
+#service-section .service-image-wrap {
+  margin-top: 18px;        /* space from paragraph */
+  padding-bottom: 24px;    /* space from bottom border */
+  display: flex;
+  justify-content: center; /* center horizontally */
+}
+
+/* Exact target size, but responsive safe */
+#service-section .service-image-box {
+  width: min(643px, 100%);
+  aspect-ratio: 643 / 598;
+  height: auto;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 30px;
+}
+
+#service-section .service-image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* no crop, no stretch */
+  display: block;
+  border-radius: 30px;
+}
+
+@media (max-width: 767px) {
+  #service-section .service-image-wrap {
+    margin-top: 14px;
+    padding-bottom: 18px;
+  }
+}

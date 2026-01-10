@@ -1,4 +1,11 @@
-function escapeHtml(input) {
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+
+type ResendSendResult = {
+  data?: { id?: string };
+  error?: { message?: string };
+};
+
+function escapeHtml(input: string) {
   return String(input)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
@@ -7,7 +14,7 @@ function escapeHtml(input) {
     .replaceAll("'", "&#039;");
 }
 
-module.exports = async function handler(req, res) {
+async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") {
     return res.status(405).json({ ok: false, error: "Method Not Allowed" });
@@ -41,21 +48,24 @@ module.exports = async function handler(req, res) {
       </div>
     `;
 
-    const result = await resend.emails.send({
+    const result = (await resend.emails.send({
       from,
       to: [toEmail],
       replyTo: email,
       subject,
       html,
-    });
+    })) as ResendSendResult;
 
     if (result?.error) {
       return res.status(500).json({ ok: false, error: result.error.message || "Failed to send" });
     }
 
     return res.status(200).json({ ok: true, id: result?.data?.id });
-  } catch (err) {
+  } catch (err: any) {
     console.error("/api/contact error", err);
     return res.status(500).json({ ok: false, error: err?.message || "Server error" });
   }
-};
+}
+
+module.exports = handler;
+export {};

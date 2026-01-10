@@ -1,7 +1,5 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-
-function escapeHtml(input: string) {
-  return input
+function escapeHtml(input) {
+  return String(input)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
@@ -9,10 +7,8 @@ function escapeHtml(input: string) {
     .replaceAll("'", "&#039;");
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Permitir preflight (si algún día tu form se consume cross-domain)
+module.exports = async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(204).end();
-
   if (req.method !== "POST") {
     return res.status(405).json({ ok: false, error: "Method Not Allowed" });
   }
@@ -20,59 +16,46 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const apiKey = process.env.RESEND_API_KEY;
   const toEmail = process.env.CONTACT_TO_EMAIL;
   const fromEmail = process.env.CONTACT_FROM_EMAIL || process.env.RESEND_FROM;
-
-  if (!apiKey) {
-    // If the API key is missing, the function may crash at module init; keep it inside handler.
-    return res.status(500).json({ ok: false, error: "Missing RESEND_API_KEY env var" });
-  }
-
-  if (!toEmail) {
-    return res.status(500).json({ ok: false, error: "Missing CONTACT_TO_EMAIL env var" });
-  }
-
-  // Resend requires a valid 'from' address. Prefer CONTACT_FROM_EMAIL, fallback to RESEND_FROM, then onboarding.
   const from = fromEmail || "Gravia <onboarding@resend.dev>";
 
-  const { Resend } = await import("resend");
+  if (!apiKey) return res.status(500).json({ ok: false, error: "Missing RESEND_API_KEY" });
+  if (!toEmail) return res.status(500).json({ ok: false, error: "Missing CONTACT_TO_EMAIL" });
+
+  const { Resend } = require("resend");
   const resend = new Resend(apiKey);
 
   try {
-    const { name, email, phone, message } = req.body ?? {};
-
+    const { name, email, phone, message } = req.body || {};
     if (!name || !email || !phone || !message) {
       return res.status(400).json({ ok: false, error: "Missing fields" });
     }
 
-    // Email que te llega a vos (lead)
     const subject = `New lead from Gravia: ${name}`;
     const html = `
       <div style="font-family: Arial, sans-serif; line-height: 1.5">
         <h2>New contact form submission</h2>
-        <p><strong>Name:</strong> ${escapeHtml(String(name))}</p>
-        <p><strong>Email:</strong> ${escapeHtml(String(email))}</p>
-        <p><strong>Phone:</strong> ${escapeHtml(String(phone))}</p>
-        <p><strong>Message:</strong><br/>${escapeHtml(String(message)).replaceAll("\n", "<br/>")}</p>
+        <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+        <p><strong>Phone:</strong> ${escapeHtml(phone)}</p>
+        <p><strong>Message:</strong><br/>${escapeHtml(message).replaceAll("\n", "<br/>")}</p>
       </div>
     `;
 
-    const { data, error } = await resend.emails.send({
+    const result = await resend.emails.send({
       from,
-      to: [toEmail], // your receiving email
-      replyTo: String(email),              // para responder directo al lead
+      to: [toEmail],
+      replyTo: email,
       subject,
       html,
     });
 
-    if (error) {
-      return res.status(500).json({ ok: false, error: error.message });
+    if (result?.error) {
+      return res.status(500).json({ ok: false, error: result.error.message || "Failed to send" });
     }
 
-    return res.status(200).json({ ok: true, id: data?.id });
-  } catch (err: any) {
+    return res.status(200).json({ ok: true, id: result?.data?.id });
+  } catch (err) {
     console.error("/api/contact error", err);
-    return res.status(500).json({
-      ok: false,
-      error: err?.message || "Server error",
-    });
+    return res.status(500).json({ ok: false, error: err?.message || "Server error" });
   }
-}
+};

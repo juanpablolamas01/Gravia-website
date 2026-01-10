@@ -10,6 +10,10 @@ interface MenuItem {
   submenu?: MenuItem[];
 }
 
+interface MobileMenuProps {
+  onNavigate?: () => void;
+}
+
 const menus: MenuItem[] = [
   {
     id: 1,
@@ -19,17 +23,17 @@ const menus: MenuItem[] = [
   {
     id: 2,
     title: "About",
-    link: "/about",
+    link: "#service-section",
   },
   
   {
     id: 6,
     title: "Contact",
-    link: "/contact",
+    link: "#contact-section",
   },
 ];
 
-const MobileMenu: React.FC = () => {
+const MobileMenu: React.FC<MobileMenuProps> = ({ onNavigate }) => {
   const [openId, setOpenId] = useState<number | null>(null);
 
   const handleToggle = (id: number) => {
@@ -38,6 +42,13 @@ const MobileMenu: React.FC = () => {
 
   const handleClick = () => {
     window.scrollTo(0, 0);
+    onNavigate?.();
+  };
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) element.scrollIntoView({ behavior: "smooth" });
+    onNavigate?.();
   };
 
   return (
@@ -68,6 +79,16 @@ const MobileMenu: React.FC = () => {
                 </ul>
               </Collapse>
             </Fragment>
+          ) : menu.link.startsWith("#") ? (
+            <a
+              href={menu.link}
+              onClick={(e) => {
+                e.preventDefault();
+                scrollToSection(menu.link.slice(1));
+              }}
+            >
+              {menu.title}
+            </a>
           ) : (
             <Link to={menu.link} onClick={handleClick}>
               {menu.title}

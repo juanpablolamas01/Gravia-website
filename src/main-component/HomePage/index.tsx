@@ -14,7 +14,7 @@ const HomePage: React.FC = () => {
 
   return (
     <Fragment>
-        <div className='AI Powered Marketing Platform'>
+        <div className='All-In-One AI Powered Marketing Platform'>
           <div className="body_wrap o-clip">
             <Header />
             <main>

@@ -151,7 +151,7 @@ const Header: React.FC = () => {
                 </div>
 
                 <nav className="xb-header-nav">
-                  <MobileMenu />
+                  <MobileMenu onNavigate={() => setMobileActive(false)} />
                 </nav>
               </div>
             </div>

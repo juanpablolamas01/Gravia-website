@@ -1,5 +1,4 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { Resend } from "resend";
 
 function escapeHtml(input: string) {
   return input
@@ -34,6 +33,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Resend requires a valid 'from' address. Prefer CONTACT_FROM_EMAIL, fallback to RESEND_FROM, then onboarding.
   const from = fromEmail || "Gravia <onboarding@resend.dev>";
 
+  const { Resend } = await import("resend");
   const resend = new Resend(apiKey);
 
   try {

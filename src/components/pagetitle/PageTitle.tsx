@@ -5,10 +5,11 @@ import { Link } from "react-router-dom";
 interface PageTitleProps {
   pageTitle: string;
   pagesub?: string;
+  children?: React.ReactNode;
 }
 
 
-const PageTitle: React.FC<PageTitleProps> = ({ pageTitle, pagesub }) => {
+const PageTitle: React.FC<PageTitleProps> = ({ pageTitle, pagesub, children }) => {
   return (
     <section
       className="breadcrumb bg_img"
@@ -27,6 +28,7 @@ const PageTitle: React.FC<PageTitleProps> = ({ pageTitle, pagesub }) => {
              {pagesub && <li className="breadcrumb-item">{pagesub}</li>}
           </ul>
           {pageTitle && <h2 className="breadcrumb__title">{pageTitle}</h2>}
+          {children && <div className="breadcrumb__extra">{children}</div>}
         </div>
       </div>
     </section>

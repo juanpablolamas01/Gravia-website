@@ -191,6 +191,8 @@ const services: ServiceItem[] = [
 
 const ServiceSection: React.FC = () => {
   const [activeId, setActiveId] = useState<number | null>(1);
+  const canHover =
+    typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches;
 
 
 
@@ -221,7 +223,9 @@ const ServiceSection: React.FC = () => {
             key={service.id}
             className={`xb-service-item xb-border xb-mouseenter ${activeId === service.id ? "active" : ""
               }`}
-            onMouseEnter={() => setActiveId(service.id)}
+            onMouseEnter={() => {
+              if (canHover) setActiveId(service.id);
+            }}
             onClick={() =>
               setActiveId((current) => (current === service.id ? null : service.id))
             }

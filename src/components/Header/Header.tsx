@@ -38,7 +38,6 @@ const Header: React.FC = () => {
   }, []);
 
   const handleClick = () => window.scrollTo({ top: 0, behavior: "smooth" });
-  const handleSubmit = (e: React.FormEvent) => e.preventDefault();
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) element.scrollIntoView({ behavior: "smooth" });
@@ -134,20 +133,6 @@ const Header: React.FC = () => {
                   <Link to="/" rel="home">
                     <img src={logo} alt="Logo" />
                   </Link>
-                </div>
-
-                <div className="xb-header-mobile-search xb-hide-xl">
-                  <form role="search" onSubmit={handleSubmit}>
-                    <input
-                      type="text"
-                      placeholder="Search..."
-                      name="s"
-                      className="search-field"
-                    />
-                    <button className="search-submit" type="submit">
-                      <i className="far fa-search"></i>
-                    </button>
-                  </form>
                 </div>
 
                 <nav className="xb-header-nav">

@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import Spline from "@splinetool/react-spline";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
@@ -26,7 +25,15 @@ const HeroSection: React.FC = () => {
                  insights—achieving better results without increasing spend.
               </p>
               <div className="hero-btn scale-animation wow">
-                <Link className="thm-btn agency-btn" to="/about">
+                <a
+                  className="thm-btn agency-btn"
+                  href="#contact-section"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const element = document.getElementById("contact-section");
+                    if (element) element.scrollIntoView({ behavior: "smooth" });
+                  }}
+                >
                   <span className="text">Join the wishlist</span>
                   <span className="arrow">
                     <span className="arrow-icon">
@@ -160,7 +167,7 @@ const HeroSection: React.FC = () => {
                       </svg>
                     </span>
                   </span>
-                </Link>
+                </a>
               </div>
             </div>
           </div>

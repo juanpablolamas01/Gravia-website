@@ -13,9 +13,9 @@ const ContactSection: React.FC = () => {
           <div className="col-lg-6 mt-50">
             <div className="xb-contact-form xb-border">
               <div className="form-heading text-center mb-30">
-                <h3 className="title">Ready to collaborate with us?</h3>
+                <h3 className="title">Join the conversation</h3>
                 <p className="sub-title">
-                  Who knows where a single message might lead you.
+                  Reach out to explore Gravia and get early access updates.
                 </p>
               </div>
               <ContactForm/>

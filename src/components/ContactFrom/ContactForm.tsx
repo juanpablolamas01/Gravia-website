@@ -15,9 +15,6 @@ const ContactForm: React.FC = () => {
     phone: "",
     message: "",
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [statusMessage, setStatusMessage] = useState("");
-
   const [validator] = useState(
     new SimpleReactValidator({ className: "errorMessage" })
   );
@@ -32,48 +29,13 @@ const ContactForm: React.FC = () => {
     else validator.showMessages();
   };
 
-  const submitHandler = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (validator.allValid()) {
-      setIsSubmitting(true);
-      setStatusMessage("");
-
-      try {
-        const response = await fetch("/api/contact", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(forms),
-        });
-
-        if (!response.ok) {
-          throw new Error("Request failed");
-        }
-
-        setForms({
-          name: "",
-          email: "",
-          phone: "",
-          message: "",
-        });
-        validator.hideMessages();
-        setStatusMessage("Gracias. Tu mensaje fue enviado correctamente.");
-      } catch (error) {
-        setStatusMessage(
-          "No se pudo enviar el mensaje. Intenta nuevamente en unos minutos."
-        );
-      } finally {
-        setIsSubmitting(false);
-      }
-    } else {
-      validator.showMessages();
-    }
-  };
-
   return (
-    <form onSubmit={submitHandler} className="xb-contact-input-form">
+    
+    <form
+      action="https://hook.us2.make.com/lskg5ri4xwwvbmlo95vpaoi6n6rdih3o"
+      method="POST"
+      className="xb-contact-input-form"
+    >
       <div className="row mt-none-20">
         {/* Name */}
         <div className="col-lg-6 col-md-6 mt-20">
@@ -115,15 +77,16 @@ const ContactForm: React.FC = () => {
             <input
               id="author-phone"
               name="phone"
-              type="text"
+              type="tel"
               value={forms.phone}
               onChange={changeHandler}
               required
+              autoComplete="tel"
             />
             <label htmlFor="author-phone">Contact No*</label>
             <img src={phoneIcon} alt="phone" />
           </div>
-          {validator.message("phone", forms.phone, "required|numeric")}
+          {validator.message("phone", forms.phone, "required")}
         </div>
 
         {/* Message */}
@@ -145,15 +108,15 @@ const ContactForm: React.FC = () => {
 
       {/* Submit Button */}
       <div className="form-submit-btn mt-35">
-        <button type="submit" className="thm-btn form-btn" disabled={isSubmitting}>
-          {isSubmitting ? "Sending..." : "Join the Wishlist"}
+        <button type="submit" className="thm-btn form-btn">
+          Join the Wishlist
           <span className="xb-icon">
             <img src={arrowIcon} alt="arrow" />
             <img src={arrowIcon} alt="arrow" />
           </span>
         </button>
       </div>
-      {statusMessage && <p className="mt-20">{statusMessage}</p>}
+      <input type="hidden" name="_redirect" value="/thanks" />
     </form>
   );
 };

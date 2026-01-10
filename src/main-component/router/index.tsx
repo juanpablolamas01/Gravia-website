@@ -6,6 +6,7 @@ import WowInit from "../../components/wowInit/wowInit";
 import Homepage from "../HomePage";
 import ScrollToTop from "./ScrollToTop";
 import ErrorPage from "../ErrorPage/ErrorPage";
+import ThankYou from "../ThankYou/ThankYou";
 
 // ✅ Router Component
 const AllRoute: React.FC = () => {
@@ -17,6 +18,7 @@ const AllRoute: React.FC = () => {
 
         <Routes>
           <Route path="/" element={<Homepage />} />
+          <Route path="/thanks" element={<ThankYou />} />
           <Route path="*" element={<ErrorPage />} />
         </Routes>
       </BrowserRouter>

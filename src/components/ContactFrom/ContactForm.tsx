@@ -83,7 +83,7 @@ const ContactForm: React.FC = () => {
               required
               autoComplete="tel"
             />
-            <label htmlFor="author-phone">Contact No*</label>
+            <label htmlFor="author-phone">Phone*</label>
             <img src={phoneIcon} alt="phone" />
           </div>
           {validator.message("phone", forms.phone, "required")}
@@ -116,7 +116,11 @@ const ContactForm: React.FC = () => {
           </span>
         </button>
       </div>
-      <input type="hidden" name="_redirect" value="/thanks" />
+      <input
+        type="hidden"
+        name="_redirect"
+        value={`${window.location.origin}/thanks`}
+      />
     </form>
   );
 };

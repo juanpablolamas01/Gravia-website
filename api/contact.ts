@@ -1,81 +1,58 @@
-const RESEND_API_URL = "https://api.resend.com/emails";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { Resend } from "resend";
 
-const buildEmailContent = (payload: {
-  name: string;
-  email: string;
-  phone?: string;
-  message: string;
-}) => {
-  const { name, email, phone, message } = payload;
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-  return {
-    subject: "Nuevo lead desde el formulario de contacto",
-    text: [
-      `Nombre: ${name}`,
-      `Email: ${email}`,
-      `Telefono: ${phone || "-"}`,
-      "",
-      "Mensaje:",
-      message,
-    ].join("\n"),
-    html: `
-      <h2>Nuevo lead desde el formulario de contacto</h2>
-      <p><strong>Nombre:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Telefono:</strong> ${phone || "-"}</p>
-      <p><strong>Mensaje:</strong></p>
-      <p>${message.replace(/\n/g, "<br/>")}</p>
-    `,
-  };
-};
-
-async function handler(req: any, res: any) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
-  const { name, email, phone, message } = req.body || {};
-
-  if (!name || !email || !message) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
-
-  const resendApiKey = process.env.RESEND_API_KEY;
-  const resendFrom = process.env.RESEND_FROM;
-  const resendTo = process.env.RESEND_TO;
-
-  if (!resendApiKey || !resendFrom || !resendTo) {
-    return res.status(500).json({ error: "Missing email configuration" });
-  }
-
-  const content = buildEmailContent({ name, email, phone, message });
-
-  try {
-    const response = await fetch(RESEND_API_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${resendApiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: resendFrom,
-        to: resendTo.split(",").map((entry) => entry.trim()),
-        reply_to: email,
-        subject: content.subject,
-        text: content.text,
-        html: content.html,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorBody = await response.text();
-      return res.status(500).json({ error: "Email send failed", detail: errorBody });
-    }
-
-    return res.status(200).json({ ok: true });
-  } catch (error) {
-    return res.status(500).json({ error: "Email send failed" });
-  }
+function escapeHtml(input: string) {
+  return input
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
-module.exports = handler;
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Permitir preflight (si algún día tu form se consume cross-domain)
+  if (req.method === "OPTIONS") return res.status(204).end();
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ ok: false, error: "Method Not Allowed" });
+  }
+
+  try {
+    const { name, email, phone, message } = req.body ?? {};
+
+    if (!name || !email || !phone || !message) {
+      return res.status(400).json({ ok: false, error: "Missing fields" });
+    }
+
+    // Email que te llega a vos (lead)
+    const subject = `New lead from Gravia: ${name}`;
+    const html = `
+      <div style="font-family: Arial, sans-serif; line-height: 1.5">
+        <h2>New contact form submission</h2>
+        <p><strong>Name:</strong> ${escapeHtml(String(name))}</p>
+        <p><strong>Email:</strong> ${escapeHtml(String(email))}</p>
+        <p><strong>Phone:</strong> ${escapeHtml(String(phone))}</p>
+        <p><strong>Message:</strong><br/>${escapeHtml(String(message)).replaceAll("\n", "<br/>")}</p>
+      </div>
+    `;
+
+    const { data, error } = await resend.emails.send({
+      from: process.env.CONTACT_FROM_EMAIL || "Gravia <onboarding@resend.dev>",
+      to: [process.env.CONTACT_TO_EMAIL!], // tu email receptor
+      replyTo: String(email),              // para responder directo al lead
+      subject,
+      html,
+    });
+
+    if (error) {
+      return res.status(500).json({ ok: false, error: error.message });
+    }
+
+    return res.status(200).json({ ok: true, id: data?.id });
+  } catch (err: any) {
+    return res.status(500).json({ ok: false, error: "Server error" });
+  }
+}
